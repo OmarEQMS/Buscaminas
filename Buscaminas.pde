@@ -3,7 +3,6 @@
 int gridX=8, gridY=8;
 int size,bombas=10;
 int defX, defY;
-Boolean mapaBombas [][]= new Boolean [gridX][gridY];
 int mapa [][]= new int  [gridX][gridY];
 void setup() {
   size(640, 480);
@@ -12,7 +11,7 @@ void setup() {
   defY = (height-(gridY*size))/2;
   IniciarBombas();
   IniciarNumeros();
-  ImprimeBombas();
+
       System.out.print("\n");
   ImprimeMapa();
   stroke(0);

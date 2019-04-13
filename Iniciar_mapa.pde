@@ -3,48 +3,37 @@ void IniciarBombas() {
   Random rand = new Random ();
   for(int i = 0; i < gridX; i++){
     for(int j = 0; j < gridY; j++){
-      mapaBombas [i][j]= false;
+      mapa [i][j]= 0;
     }
   }
   int x,y;
   for (int i =0;i<bombas;i++) {
     x= rand.nextInt(gridX);
     y= rand.nextInt(gridY);
-    while (mapaBombas [x][y] == true) {
+    while (mapa [x][y] == -1) {
       x= rand.nextInt(gridX);
       y= rand.nextInt(gridY);
     }
-    mapaBombas [x][y]= true;
+    mapa [x][y]= -1;
   }
 }
 void IniciarNumeros() {
   int vecinos;
   for(int i = 0; i < gridX; i++){
     for(int j = 0; j < gridY; j++){
-      if (mapaBombas[i][j] == false ) {
+      if (mapa[i][j] == 0 ) {
         vecinos = 0;
-        if (i>0 && mapaBombas [i-1][j] ==true) 
+        if (i>0 && mapa [i-1][j] ==-1) 
           vecinos++;
-        if (i<gridX-1 && mapaBombas [i+1][j] ==true) 
+        if (i<gridX-1 && mapa [i+1][j] ==-1) 
           vecinos++;
-        if (j>0 && mapaBombas [i][j-1] ==true) 
+        if (j>0 && mapa [i][j-1] ==-1) 
           vecinos++;
-        if (j<gridY-1 && mapaBombas [i][j+1] ==true) 
+        if (j<gridY-1 && mapa [i][j+1] ==-1) 
           vecinos++;
         mapa [i][j]= vecinos;
       }
     }
-  }
-}
-void ImprimeBombas(){
-   for(int i = 0; i < gridX; i++){
-    for(int j = 0; j < gridY; j++){
-       if (mapaBombas [i][j] == false)
-         System.out.print(0 + " ");
-       else 
-         System.out.print(1 + " ");
-    }
-     System.out.print("\n");
   }
 }
 void ImprimeMapa(){
