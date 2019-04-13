@@ -31,6 +31,14 @@ void IniciarNumeros() {
           vecinos++;
         if (j<gridY-1 && mapa [i][j+1] ==-1) 
           vecinos++;
+        if (i>0 && j>0 && mapa [i-1][j-1] ==-1) 
+          vecinos++;
+        if (i<gridX-1 && j<gridX-1&& mapa [i+1][j+1] ==-1) 
+          vecinos++;
+        if (j>0 && i<gridX-1 &&  mapa [i+1][j-1] ==-1) 
+          vecinos++;
+        if (i>0 && j<gridY-1 && mapa [i-1][j+1] ==-1) 
+          vecinos++;
         mapa [i][j]= vecinos;
       }
     }
