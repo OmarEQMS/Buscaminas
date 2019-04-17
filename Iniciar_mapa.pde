@@ -4,6 +4,7 @@ void IniciarBombas() {
   for(int i = 0; i < gridX; i++){
     for(int j = 0; j < gridY; j++){
       mapa [i][j]= 0;
+      tapados [i][j] = true;
     }
   }
   int x,y;
@@ -51,4 +52,9 @@ void ImprimeMapa(){
     }
     System.out.print("\n");
   }
+}
+public void Click (int x, int y){
+  if (x<gridX && y<gridY)
+    tapados [x][y] = false;
+    //Falta implementar que cuando sea 0 se quiten todos los adyacentes
 }
