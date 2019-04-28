@@ -1,10 +1,11 @@
 class Tablero {
   int gridX, gridY;
   int size,bombas;
+  boolean finished;
   int defX, defY;
   int mapa [][];
   boolean tapados [][];
-  PImage bomba;
+  PImage bomba, gameOver;
   Tablero (){
      gridX=8;
      gridY=8;
@@ -14,50 +15,57 @@ class Tablero {
      defY = (height-(gridY*size))/2;
      mapa= new int  [gridX][gridY];
      tapados = new boolean [gridX][gridY];
+     finished = false;
   }
   
   void setupTablero() {    
     IniciarBombas();
     IniciarNumeros();
     bomba = loadImage ("minesweeper.png");
+    gameOver= loadImage( "GO.jpg");
     bomba.resize (32,32);
     System.out.print("\n");
     ImprimeMapa();
   }
   void drawTablero () {
-    int auxColor;
-    for(int i = 0; i < gridX; i++){
-      for(int j = 0; j < gridY; j++){
-        textSize(32);
-        fill (150,150,150);
-        rect(defX + (i*size), defY + (j*size), size, size);
-        auxColor = mapa [i][j];
-        switch (auxColor){
-          case -1: fill(0,0,0);
-          case 1: fill (0,0,255); break;
-          case 2: fill (0,255,0); break;
-          case 3: fill (255,0,0); break;
-          default: fill (135,0,0); break;
-        }
-        if (auxColor !=-1){
-          if (auxColor != 0)
-            text (mapa[i][j],defX+15 + (i*size),defY + (j*size)+50);
-        }else {   
-          image(bomba, defX + 10+(i*size),defY + (j*size)+10);
-        }
-        if (tapados [i][j] == true){
-          fill (100,100,100);
+    if (finished==false) {
+      int auxColor;
+      for(int i = 0; i < gridY; i++){
+        for(int j = 0; j < gridX; j++){
+          textSize(32);
+          fill (150,150,150);
           rect(defX + (i*size), defY + (j*size), size, size);
+          auxColor = mapa [i][j];
+          switch (auxColor){
+            case -1: fill(0,0,0);
+            case 1: fill (0,0,255); break;
+            case 2: fill (0,255,0); break;
+            case 3: fill (255,0,0); break;
+            default: fill (135,0,0); break;
+          }
+          if (auxColor !=-1){
+            if (auxColor != 0)
+              text (mapa[i][j],defX+15 + (i*size),defY + (j*size)+50);
+          }else {   
+            image(bomba, defX + 10+(i*size),defY + (j*size)+10);
+          }
+          if (tapados [i][j] == true){
+            fill (100,100,100);
+            rect(defX + (i*size), defY + (j*size), size, size);
+          }
+            
         }
-          
       }
-    }
+    } else {
+      background (500);
+      image(gameOver, 50,50);
+    } 
   }
   void IniciarBombas() {
    
     Random rand = new Random ();
-    for(int i = 0; i < gridX; i++){
-      for(int j = 0; j < gridY; j++){
+    for(int i = 0; i < gridY; i++){
+      for(int j = 0; j < gridX; j++){
         mapa [i][j]= 0;
         tapados [i][j] = true;
       }
@@ -75,8 +83,8 @@ class Tablero {
   }
   void IniciarNumeros() {
     int vecinos;
-    for(int i = 0; i < gridX; i++){
-      for(int j = 0; j < gridY; j++){
+    for(int i = 0; i < gridY; i++){
+      for(int j = 0; j < gridX; j++){
         if (mapa[i][j] == 0 ) {
           vecinos = 0;
           if (i>0 && mapa [i-1][j] ==-1) 
@@ -101,25 +109,53 @@ class Tablero {
     }
   }
   void ImprimeMapa(){
-    for(int i = 0; i < gridX; i++){
-      for(int j = 0; j < gridY; j++){
+    for(int i = 0; i < gridY; i++){
+      for(int j = 0; j < gridX; j++){
          System.out.print( mapa[i][j] + " ");
       }
       System.out.print("\n");
     }
   }
   void descubreCeros (int i,int j) {
-                                                                            //DESCUBRIR CEROS
+    if (mapa [i][j]==0) {
+      tapados [i][j] = false;
+      
+    } 
+    if (i<gridY-1 && tapados [i+1][j]==true && mapa [i+1][j] ==0){
+      descubreCeros (i+1,j);
+      if (j<gridX-1 && tapados [i+1][j+1]==true && mapa [i+1][j+1]==0)
+        descubreCeros (i+1,j+1);
+      if (j>0&& tapados [i+1][j-1]==true && mapa [i+1][j-1]== 0)
+        descubreCeros (i+1, j-1);
+    }
+    if (j<gridX-1&& tapados [i][j+1]==true && mapa [i][j+1]==0)
+      descubreCeros (i,j+1);
+    if (j>0 && tapados [i][j-1]==true && mapa [i][j-1]==0)   
+      descubreCeros (i,j-1);
+    if (i>0 && tapados [i-1][j]==true && mapa [i-1][j]==0){
+      descubreCeros (i-1, j);
+      if (j>0 && tapados [i-1][j-1]==true && mapa [i-1][j-1]==0)
+        descubreCeros (i-1,j-1);
+      if (j<gridX-1 && tapados [i-1][j+1]==true && mapa [i-1][j+1]==0)
+        descubreCeros (i-1,j+1);
+    }
   }
+
   public boolean Click (int x, int y){
     if (x<gridX && y<gridY){
+      if (mapa [x][y] ==0){
+        descubreCeros(x,y);
+        return true;
+      }
       tapados [x][y] = false;
-      if (mapa [x][y]==-1) 
+      if (mapa [x][y]==-1) {
+        finished = true;
         return false;
-        else 
+        
+      }  else 
           return true;
     } 
-    return false;                                                                  //Falta implementar que cuando sea 0 se quiten todos los adyacentes
+    return false;                                                                 
   }
   public boolean [][] getTapados  (){
     return tapados;

@@ -9,6 +9,10 @@ void setup() {
   tablero = new Tablero();
   size(640, 480);
   tablero.setupTablero();
+  for (int i =0;i<8;i++) {
+    
+      tablero.Click (i,i);
+  }
 }
 
 void draw() { 
