@@ -2,14 +2,15 @@ class Tablero {
   //Mapa
   int mapa [][];
   boolean tapados [][];
+  boolean banderines [][];
   //Setup
   int gridX, gridY;
   int size, bombas, defX, defY;
   boolean finished; float transparency = 0;
   //Images
-  PImage bomba, gameOver;
+  PImage bomba, gameOver, banderin;
   
-  Tablero (int x, int y, int b){
+  Tablero (int y, int x, int b){
     //Setup
     gridX=x; gridY=y; bombas=b; finished = false;
     //Size
@@ -17,15 +18,28 @@ class Tablero {
     defX = (width-(gridX*size))/2;
     defY = (height-(gridY*size))/2;
     //Mapa
-    mapa= new int  [gridX][gridY];
-    tapados = new boolean [gridX][gridY];
+    mapa= new int  [gridY][gridX]; //-1 bomba, -2 banderin
+    tapados = new boolean [gridY][gridX];
+    banderines = new boolean [gridY][gridX];
     //Images
     bomba = loadImage ("minesweeper.png");
     gameOver= loadImage( "GO.jpg");
+    banderin= loadImage( "banderin.png");
     bomba.resize (32,32);
+    banderin.resize (32,32);
     //Init
     setupTablero();
   }
+  
+  //Params to Jugador
+  public int GetCelda(int y, int x){
+    if(banderines[y][x]==true) return -1;
+    if(tapados[y][x]==true) return -2;
+    if (!ValidarCelda(y,x,gridX,gridY)) return -2;
+    return mapa[y][x];
+  }
+  public int GetGridX(){ return gridX; }
+  public int GetGridY(){ return gridY; }
   
   //INIT
   void setupTablero() {   
@@ -39,6 +53,7 @@ class Tablero {
       for(int j = 0; j < gridX; j++){
         mapa [i][j]= 0;
         tapados [i][j] = true;
+        banderines [i][j] = false;
       }
     }
   }
@@ -48,8 +63,8 @@ class Tablero {
       do {
         x= floor(random(gridX));
         y= floor(random(gridY));
-      }while(mapa [x][y] == -1);
-      mapa [x][y] = -1;
+      }while(mapa [y][x] == -1);
+      mapa [y][x] = -1;
     }
   }
   void IniciarNumeros() {
@@ -87,27 +102,34 @@ class Tablero {
     for(int i = 0; i < gridY; i++){
       for(int j = 0; j < gridX; j++){
         if (tapados [i][j] == true){
-          fill (100,100,100);
-          rect(defX + (i*size), defY + (j*size), size, size);
+          if(banderines[i][j]==true) {  //Banderin
+            fill (150,150,150);
+            rect(defX + (j*size), defY + (i*size), size, size);
+            fill(0,0,0);
+            image(banderin, defX + 10+(j*size),defY + (i*size)+10);
+          }else{
+            fill (100,100,100);
+            rect(defX + (j*size), defY + (i*size), size, size);
+          }
         }else{
           celda = mapa [i][j];          
           if (celda > 0){  //Numero
             fill (150,150,150);
-            rect(defX + (i*size), defY + (j*size), size, size);
+            rect(defX + (j*size), defY + (i*size), size, size);
             switch (celda){            
               case 1: fill (0,0,255); break;
               case 2: fill (0,255,0); break;
               case 3: fill (255,0,0); break;
               default: fill (135,0,0); break;
             }
-            text (mapa[i][j], defX+15 + (i*size),defY + (j*size)+50);
+            text (mapa[i][j], defX+15 + (j*size),defY + (i*size)+50);
           }else if(celda==0) { //Cero
             fill (150,150,150);
-            rect(defX + (i*size), defY + (j*size), size, size);
+            rect(defX + (j*size), defY + (i*size), size, size);
           }else if(celda==-1) {  //Bomca
             fill(0,0,0);
-            image(bomba, defX + 10+(i*size),defY + (j*size)+10);
-          }            
+            image(bomba, defX + 10+(j*size),defY + (i*size)+10);
+          }  
         }   
       }
     }
@@ -120,37 +142,51 @@ class Tablero {
   }
   
   //Click
-  public void ClickMouse (int x, int y){
+  public void ClickMouse (int y, int x){
     x = x - defX; y = y - defY;
     x = x/size; y = y/size;
-    Click(x,y);
+    Click(y,x);
   }
-  public boolean Click (int x, int y){
+  public void ClickMouseDerecho (int y, int x){
+    x = x - defX; y = y - defY;
+    x = x/size; y = y/size;
+    ClickDerecho(y,x);
+  }
+  public boolean Click (int y, int x){
     if (finished==true) return false;
-    if (!ValidarCelda(x,y,gridX,gridY)) return false;
-    if (tapados [x][y] == false) return false;
+    if (!ValidarCelda(y,x,gridX,gridY)) return false;
+    if (tapados [y][x] == false) return false;
     
-    tapados [x][y] = false;
-    if (mapa [x][y]==-1) {      
+    tapados [y][x] = false;
+    if (mapa [y][x]==-1) {      
       finished = true; //Game OVer
       return false;
     }else{
-      if (mapa[x][y] == 0) descubreCeros(x,y);
+      if (mapa[y][x] == 0) descubreCeros(y,x);
       return true;
     }
   }
+  public boolean ClickDerecho (int y, int x){
+    if (finished==true) return false;
+    if (!ValidarCelda(y,x,gridX,gridY)) return false;
+    if (tapados [y][x] == false) return false;
+    if (banderines[y][x]==true) return false;
+    
+    banderines[y][x] = true;
+    return true;
+  }
   void descubreCeros (int i,int j) {
     if (mapa [i][j]==0) {
-      tapados [i][j] = false;      
-    } 
-    if (ValidarCelda(i+1,j,gridX, gridY) && tapados [i+1][j]==true && mapa [i+1][j] ==0) descubreCeros (i+1,j);
-    if (ValidarCelda(i,j+1,gridX, gridY) && tapados [i][j+1]==true && mapa [i][j+1]==0) descubreCeros (i,j+1);
-    if (ValidarCelda(i,j-1,gridX, gridY) && tapados [i][j-1]==true && mapa [i][j-1]==0) descubreCeros (i,j-1);
-    if (ValidarCelda(i-1,j,gridX, gridY) && tapados [i-1][j]==true && mapa [i-1][j]==0) descubreCeros (i-1, j);
+      tapados [i][j] = false;        
+      if (ValidarCelda(i+1,j,gridX, gridY) && tapados [i+1][j]==true && mapa [i+1][j] ==0) descubreCeros (i+1,j);
+      if (ValidarCelda(i,j+1,gridX, gridY) && tapados [i][j+1]==true && mapa [i][j+1]==0) descubreCeros (i,j+1);
+      if (ValidarCelda(i,j-1,gridX, gridY) && tapados [i][j-1]==true && mapa [i][j-1]==0) descubreCeros (i,j-1);
+      if (ValidarCelda(i-1,j,gridX, gridY) && tapados [i-1][j]==true && mapa [i-1][j]==0) descubreCeros (i-1, j);
+    }
   }
 
-  boolean ValidarCelda(int pX, int pY, int sizeX, int sizeY){
+  boolean ValidarCelda(int pY, int pX, int sizeX, int sizeY){
     return (pX<sizeX && pX>=0 && pY<sizeY && pY>=0);
   }
-  
+
 }
