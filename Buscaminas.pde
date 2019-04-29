@@ -1,21 +1,16 @@
 //Buscaminas
-import java.util.Random;
-import java.util.Stack;
+
 Tablero tablero;
 void setup() {
-  stroke(0);
-  color(255);
-  background(0);
-  tablero = new Tablero();
+  stroke(0); color(255); background(0); textSize(32);
   size(640, 480);
-  tablero.setupTablero();
-  for (int i =0;i<8;i++) {
-    
-      tablero.Click (i,i);
-  }
+  tablero = new Tablero(8,8,10);
 }
 
 void draw() { 
   tablero.drawTablero();
-  
+}
+
+void mouseClicked() {
+  tablero.ClickMouse(mouseX, mouseY);
 }
