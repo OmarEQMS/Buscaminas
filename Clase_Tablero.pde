@@ -25,8 +25,12 @@ class Tablero {
     bomba = loadImage ("minesweeper.png");
     gameOver= loadImage( "GO.jpg");
     banderin= loadImage( "banderin.png");
-    bomba.resize (32,32);
-    banderin.resize (32,32);
+    //Size
+    textAlign(CENTER);
+    imageMode(CENTER);
+    textSize(size);    
+    bomba.resize (size,size);
+    banderin.resize (size,size);
     //Init
     setupTablero();
   }
@@ -40,6 +44,7 @@ class Tablero {
   }
   public int GetGridX(){ return gridX; }
   public int GetGridY(){ return gridY; }
+  public int GetBombas(){ return bombas; }
   
   //INIT
   void setupTablero() {   
@@ -106,7 +111,7 @@ class Tablero {
             fill (150,150,150);
             rect(defX + (j*size), defY + (i*size), size, size);
             fill(0,0,0);
-            image(banderin, defX + 10+(j*size),defY + (i*size)+10);
+            image(banderin, defX+(j*size) + size/2,defY + (i*size) + size/2);
           }else{
             fill (100,100,100);
             rect(defX + (j*size), defY + (i*size), size, size);
@@ -122,13 +127,13 @@ class Tablero {
               case 3: fill (255,0,0); break;
               default: fill (135,0,0); break;
             }
-            text (mapa[i][j], defX+15 + (j*size),defY + (i*size)+50);
+            text (mapa[i][j], defX + (j*size) + size/2,defY + (i*size) + size);
           }else if(celda==0) { //Cero
             fill (150,150,150);
             rect(defX + (j*size), defY + (i*size), size, size);
           }else if(celda==-1) {  //Bomca
             fill(0,0,0);
-            image(bomba, defX + 10+(j*size),defY + (i*size)+10);
+            image(bomba, defX + (j*size) + size/2,defY + (i*size) + size/2);
           }  
         }   
       }
@@ -137,7 +142,7 @@ class Tablero {
     if (finished==true) {
       tint(255, transparency);
       if(transparency < 255) transparency += 1;
-      image(gameOver, 0,0,width,height);      
+      image(gameOver, width/2,height/2,width,height);      
     } 
   }
   
