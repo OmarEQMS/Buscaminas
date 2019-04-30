@@ -102,7 +102,9 @@ class Tablero {
   }
   
   //Draw
-  void drawTablero () {     
+  void drawTablero () { 
+    tint(255, 255);
+    
     int celda;
     for(int i = 0; i < gridY; i++){
       for(int j = 0; j < gridX; j++){
@@ -141,7 +143,7 @@ class Tablero {
     
     if (finished==true) {
       tint(255, transparency);
-      if(transparency < 255) transparency += 1;
+      if(transparency < 100) transparency += 1;
       image(gameOver, width/2,height/2,width,height);      
     } 
   }

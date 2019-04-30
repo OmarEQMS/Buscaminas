@@ -56,28 +56,35 @@ class Jugador{
       //Segundo intento, para cada celda, veo la posibilidad de una bomba, tomo la mayor
       cambiosBIG = false;
       if(CartasCerradas()!=0){
-        Punto mejor = new Punto(0,0); double posibilidad=0; boolean repetido = false;
+        ArrayList<Punto> mejores = new ArrayList<Punto>();
+        double posibilidad=0;
         for(int i = 0; i < gridY; i++){
           for(int j = 0; j < gridX; j++){
             if(mapa[i][j]==-2){ //Las tapadas, posibilidad de ser mina
               double pos = MinasNecesariasAlrededor(i,j);
-              if(pos>0) print("(" + i + "," + j + "):" + pos + "\n");
               if(pos==posibilidad){
-                repetido=true;
+                mejores.add(new Punto(i,j));
               }else if(pos>posibilidad){
                 posibilidad = pos;
-                mejor.y =i; mejor.x = j;
-                repetido = false;
+                mejores.clear();
+                mejores.add(new Punto(i,j));
               }
             }
           }
         }
-        if(posibilidad>0 && repetido==false){
-          print("Tomando mejor posibilidad de ser mina(" + mejor.y + "," + mejor.x + ")\n");
-          mapa[mejor.y][mejor.x] = -1;
-          if(tablero.ClickDerecho(mejor.y,mejor.x)) cambiosBIG = true;
+        if(posibilidad>0){
+          int k = floor(random(mejores.size()));
+          mapa[mejores.get(k).y][mejores.get(k).x] = -1;
+          if(tablero.ClickDerecho(mejores.get(k).y,mejores.get(k).x)){
+            print(posibilidad + " posibilidad de ser mina(" + mejores.get(k).y + "," + mejores.get(k).x + ") de " + mejores.size() + " opciones : ");
+            for(int l = 0; l< mejores.size(); l++)
+              print("(" + mejores.get(l).y + "," + mejores.get(l).x + ") ");
+            print("\n");
+            cambiosBIG = true;
+          }
         }
       }
+      //Ya solo quedan bombas?
       if(CartasCerradas()==bombas-MinasDescubiertas() && CartasCerradas()!=0){
         print("Ya solo quedan bombas");
         for(int i = 0; i < gridY; i++){
@@ -91,7 +98,7 @@ class Jugador{
     if(CartasCerradas()==0){
       print("Acabe\n"); 
     }else{
-      print("Echame la Mano\n"); 
+      print("No Pude\n"); 
     }
   }
   
@@ -122,14 +129,14 @@ class Jugador{
   }  
   double MinasNecesariasAlrededor(int i, int j){
     double posibilidadDeMina = 0;
-    if (ValidarCelda(i-1,j,gridX,gridY) && mapa [i-1][j]>0 ) posibilidadDeMina += (double)(mapa [i-1][j]-MinasAlrededor(i-1,j)) / mapa [i-1][j];
-    if (ValidarCelda(i+1,j,gridX,gridY) && mapa [i+1][j]>0 ) posibilidadDeMina += (double)(mapa [i+1][j]-MinasAlrededor(i+1,j)) / mapa [i+1][j];
-    if (ValidarCelda(i,j-1,gridX,gridY) && mapa [i][j-1]>0 ) posibilidadDeMina += (double)(mapa [i][j-1]-MinasAlrededor(i,j-1)) / mapa [i][j-1];
-    if (ValidarCelda(i,j+1,gridX,gridY) && mapa [i][j+1]>0 ) posibilidadDeMina += (double)(mapa [i][j+1]-MinasAlrededor(i,j+1)) / mapa [i][j+1];
-    if (ValidarCelda(i-1,j-1,gridX,gridY) && mapa [i-1][j-1]>0 ) posibilidadDeMina += (double)(mapa [i-1][j-1]-MinasAlrededor(i-1,j-1)) / mapa [i-1][j-1];
-    if (ValidarCelda(i+1,j+1,gridX,gridY) && mapa [i+1][j+1]>0 ) posibilidadDeMina += (double)(mapa [i+1][j+1]-MinasAlrededor(i+1,j+1)) / mapa [i+1][j+1];
-    if (ValidarCelda(i+1,j-1,gridX,gridY) && mapa [i+1][j-1]>0 ) posibilidadDeMina += (double)(mapa [i+1][j-1]-MinasAlrededor(i+1,j-1)) / mapa [i+1][j-1];
-    if (ValidarCelda(i-1,j+1,gridX,gridY) && mapa [i-1][j+1]>0 ) posibilidadDeMina += (double)(mapa [i-1][j+1]-MinasAlrededor(i-1,j+1)) / mapa [i-1][j+1];
+    if (ValidarCelda(i-1,j,gridX,gridY) && mapa [i-1][j]>0 ) posibilidadDeMina += (double)(mapa [i-1][j]-MinasAlrededor(i-1,j)) / CerradasAlrededor(i-1, j).size();
+    if (ValidarCelda(i+1,j,gridX,gridY) && mapa [i+1][j]>0 ) posibilidadDeMina += (double)(mapa [i+1][j]-MinasAlrededor(i+1,j)) / CerradasAlrededor(i+1, j).size();
+    if (ValidarCelda(i,j-1,gridX,gridY) && mapa [i][j-1]>0 ) posibilidadDeMina += (double)(mapa [i][j-1]-MinasAlrededor(i,j-1)) / CerradasAlrededor(i, j-1).size();
+    if (ValidarCelda(i,j+1,gridX,gridY) && mapa [i][j+1]>0 ) posibilidadDeMina += (double)(mapa [i][j+1]-MinasAlrededor(i,j+1)) / CerradasAlrededor(i, j+1).size();
+    if (ValidarCelda(i-1,j-1,gridX,gridY) && mapa [i-1][j-1]>0 ) posibilidadDeMina += (double)(mapa [i-1][j-1]-MinasAlrededor(i-1,j-1)) / CerradasAlrededor(i-1,j-1).size();
+    if (ValidarCelda(i+1,j+1,gridX,gridY) && mapa [i+1][j+1]>0 ) posibilidadDeMina += (double)(mapa [i+1][j+1]-MinasAlrededor(i+1,j+1)) / CerradasAlrededor(i+1,j+1).size();
+    if (ValidarCelda(i+1,j-1,gridX,gridY) && mapa [i+1][j-1]>0 ) posibilidadDeMina += (double)(mapa [i+1][j-1]-MinasAlrededor(i+1,j-1)) / CerradasAlrededor(i+1,j-1).size();
+    if (ValidarCelda(i-1,j+1,gridX,gridY) && mapa [i-1][j+1]>0 ) posibilidadDeMina += (double)(mapa [i-1][j+1]-MinasAlrededor(i-1,j+1)) / CerradasAlrededor(i-1,j+1).size();
     return posibilidadDeMina;
   }
   int MinasDescubiertas(){

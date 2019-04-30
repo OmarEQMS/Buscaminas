@@ -5,7 +5,7 @@ Jugador jugador;
 void setup() {
   stroke(0); color(255); background(0);
   size(1300, 900);
-  tablero = new Tablero(50,50,700);
+  tablero = new Tablero(50,50,375);
   jugador = new Jugador(tablero);
 }
 
